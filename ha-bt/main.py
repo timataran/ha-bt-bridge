@@ -2,10 +2,10 @@ import logging
 import json
 import paho.mqtt.client as mqtt
 from config import Config
+from device.elk_bledom import LedRgb
 
-logging.basicConfig()
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 _LOGGER = logging.getLogger('ha-bt')
-_LOGGER.setLevel(logging.DEBUG)
 
 _CONFIG = Config()
 
@@ -27,17 +27,18 @@ def connect_mqtt() -> mqtt:
 def send_config(client):
     topic = 'homeassistant/light/rgb_stripe_one/config'
 
-    message = {
+    config = {
         "schema": "json",
         "name": "RGB stripe test",
         "command_topic": "homeassistant/light/rgb_stripe_one/set",
         "state_topic": "homeassistant/light/rgb_stripe_one/state",
         "unique_id": "rgb_stripe_one",
         "brightness": True,
+        "brightness_scale": 100,
         "rgb": True,
     }
 
-    client.publish(topic, json.dumps(message), qos=1)
+    client.publish(topic, json.dumps(config), qos=1)
 
 
 def subscribe(mqtt_client):
@@ -45,7 +46,8 @@ def subscribe(mqtt_client):
         payload = msg.payload.decode()
         _LOGGER.debug(f"Received `{payload}` from `{msg.topic}` topic")
         state = json.loads(payload)
-        state['color_mode'] = True
+        led = LedRgb(_CONFIG.MAC)
+        led.set_state(state)
         mqtt_client.publish('homeassistant/light/rgb_stripe_one/state', json.dumps(state), qos=1)
 
     mqtt_client.subscribe('homeassistant/light/rgb_stripe_one/set')

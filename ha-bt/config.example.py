@@ -8,3 +8,4 @@ class MqttConfig:
 
 class Config:
     MQTT = MqttConfig()
+    MAC = 'aa:bb:22:33:44:55'

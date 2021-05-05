@@ -1,7 +1,9 @@
 import logging
-from bluepy.btle import Peripheral, BTLEDisconnectError
+import bluepy.btle
 
 _LOGGER = logging.getLogger(__name__)
+
+ZERO = b'\x00'
 
 
 class LedRgb:
@@ -19,7 +21,7 @@ class LedRgb:
             else:
                 self._set_light(new_state)
 
-        except BTLEDisconnectError as err:
+        except bluepy.btle.BTLEDisconnectError as err:
             _LOGGER.error(f'BT connection error: {err}')
         finally:
             if self.device is not None:
@@ -27,36 +29,36 @@ class LedRgb:
 
     def _switch_power(self, state):
         if state == 'OFF':
-            self.handle.write(b'\x7e\x00\x04\x00\x00\x00\x00\x00\xef')
+            self._send_packet(b'\x04', b'\x00')
         else:
-            self.handle.write(b'\x7e\x00\x04\x01\x00\x00\x00\x00\xef')
+            self._send_packet(b'\x04', b'\x01')
 
     def _set_light(self, new_state):
         color = new_state.get('color')
         if color is not None:
-            packet = frame = b'\x7e\x00\x05\x03'
-            packet += bytes([color['r']])
-            packet += bytes([color['g']])
-            packet += bytes([color['b']])
-            packet += b'\x00\xef'
-            self.handle.write(packet)
+            self._send_packet(
+                b'\x05',
+                b'\x03',
+                bytes([color['r']]),
+                bytes([color['g']]),
+                bytes([color['b']]),
+            )
 
         brightness = new_state.get('brightness')
         if brightness is not None:
-            packet = b'\x7e\x00\x01'
-            packet += bytes([brightness])
-            packet += b'\x00\x00\x00\x00\xef'
-            self.handle.write(packet)
+            self._send_packet(b'\x01', bytes([brightness]))
 
     def _get_state_handle(self):
-        self.device = Peripheral(self.mac)
-        services = list(self.device.getServices())
+        self.device = bluepy.btle.Peripheral(self.mac)
+        characteristics = self.device.getCharacteristics()
 
-        for service in services:
-            characteristics = service.getCharacteristics()
-            for handle in characteristics:
-                if handle.propertiesToString().find('WRITE') > 0:
-                    self.handle = handle
-                    return
+        for handle in characteristics:
+            if handle.propertiesToString().find('WRITE') > 0:
+                self.handle = handle
+                return
 
-        raise BTLEDisconnectError('failed to retrieve writable attribute')
+        raise bluepy.btle.BTLEDisconnectError('failed to retrieve writable attribute')
+
+    def _send_packet(self, command, sub_command, arg_1=ZERO, arg_2=ZERO, arg_3=ZERO):
+        packet = b'\x7e\x00' + command + sub_command + arg_1 + arg_2 + arg_3 + b'\x00\xef'
+        self.handle.write(packet)

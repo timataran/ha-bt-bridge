@@ -2,7 +2,7 @@ import logging
 import json
 import paho.mqtt.client as mqtt
 from config import Config
-from device.elk_bledom import LedRgb
+from device.elk_bledom import LedRgb, Effect
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 _LOGGER = logging.getLogger('ha-bt')
@@ -36,6 +36,8 @@ def send_config(client):
         "brightness": True,
         "brightness_scale": 100,
         "rgb": True,
+        "effect": True,
+        "effect_list": Effect.get_effect_list()
     }
 
     client.publish(topic, json.dumps(config), qos=1)
@@ -48,6 +50,8 @@ def subscribe(mqtt_client):
         state = json.loads(payload)
         led = LedRgb(_CONFIG.MAC)
         led.set_state(state)
+        if state.get('color') is not None:
+            state['effect'] = None
         mqtt_client.publish('homeassistant/light/rgb_stripe_one/state', json.dumps(state), qos=1)
 
     mqtt_client.subscribe('homeassistant/light/rgb_stripe_one/set')

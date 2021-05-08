@@ -48,6 +48,10 @@ class LedRgb:
         if brightness is not None:
             self._send_packet(Brightness.COMMAND, bytes([brightness]))
 
+        effect_name = new_state.get('effect')
+        if effect_name is not None:
+            self._send_packet(Effect.COMMAND, Effect.get_code(effect_name), Effect.COMMAND)
+
     def _get_state_handle(self):
         self.device = bluepy.btle.Peripheral(self.mac)
         characteristics = self.device.getCharacteristics()
@@ -77,3 +81,47 @@ class Brightness:
 class Color:
     COMMAND = b'\x05'
     SUB_COMMAND = b'\x03'
+
+
+class Effect:
+    COMMAND = b'\x03'
+
+    EFFECT_LIST = {
+        'RED': b'\x80',
+        'BLUE': b'\x81',
+        'GREEN': b'\x82',
+        'CYAN': b'\x83',
+        'YELLOW': b'\x84',
+        'MAGENTA': b'\x85',
+        'WHITE': b'\x86',
+        'JUMP_RED_GREEN_BLUE': b'\x87',
+        'JUMP_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE': b'\x88',
+        'CROSSFADE_RED': b'\x8B',
+        'CROSSFADE_GREEN': b'\x8C',
+        'CROSSFADE_BLUE': b'\x8D',
+        'CROSSFADE_YELLOW': b'\x8E',
+        'CROSSFADE_CYAN': b'\x8F',
+        'CROSSFADE_MAGENTA': b'\x90',
+        'CROSSFADE_WHITE': b'\x91',
+        'CROSSFADE_RED_GREEN': b'\x92',
+        'CROSSFADE_RED_BLUE': b'\x93',
+        'CROSSFADE_GREEN_BLUE': b'\x94',
+        'CROSSFADE_RED_GREEN_BLUE': b'\x89',
+        'CROSSFADE_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE': b'\x8A',
+        'BLINK_RED': b'\x96',
+        'BLINK_GREEN': b'\x97',
+        'BLINK_BLUE': b'\x98',
+        'BLINK_YELLOW': b'\x99',
+        'BLINK_CYAN': b'\x9A',
+        'BLINK_MAGENTA': b'\x9B',
+        'BLINK_WHITE': b'\x9C',
+        'BLINK_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE': b'\x95'
+    }
+
+    @staticmethod
+    def get_code(name):
+        return Effect.EFFECT_LIST.get(name)
+
+    @staticmethod
+    def get_effect_list():
+        return list(Effect.EFFECT_LIST.keys())

@@ -1,72 +1,83 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
 from device.elk_bledom import LedRgb, Effect
+from device.connection import BTConnectError
 
 
-@patch("device.elk_bledom.bluepy.btle")
+@patch("device.elk_bledom.Connection")
 class TestCommands(TestCase):
+    def setUp(self):
+        self.handle = Mock()
+        connection = Mock()
+        connection.get_handle.return_value = self.handle
 
-    def test_send_switch_on_packet(self, btle_mock):
-        attribute = self._build_characteristic_mock()
-        device_mock = Mock()
-        device_mock.getCharacteristics.return_value = [attribute]
+        self.connection = connection
 
-        btle_mock.Peripheral.return_value = device_mock
+    def test_send_switch_on_packet(self, connection_mock):
+        connection_mock.return_value = self.connection
 
         led = LedRgb('mac value')
         led.set_state({'state': 'ON'})
 
-        attribute.write.assert_called_with(b'\x7e\x00\x04\x01\x00\x00\x00\x00\xef')
+        self.handle.write.assert_called_with(b'\x7e\x00\x04\x01\x00\x00\x00\x00\xef')
 
-    def test_send_switch_off_packet(self, btle_mock):
-        attribute = self._build_characteristic_mock()
-        device_mock = Mock()
-        device_mock.getCharacteristics.return_value = [attribute]
-
-        btle_mock.Peripheral.return_value = device_mock
+    def test_send_switch_off_packet(self, connection_mock):
+        connection_mock.return_value = self.connection
 
         led = LedRgb('mac value')
         led.set_state({'state': 'OFF'})
 
-        attribute.write.assert_called_with(b'\x7e\x00\x04\x00\x00\x00\x00\x00\xef')
+        self.handle.write.assert_called_with(b'\x7e\x00\x04\x00\x00\x00\x00\x00\xef')
 
-    def test_send_color_change_packet(self, btle_mock):
-        attribute = self._build_characteristic_mock()
-        device_mock = Mock()
-        device_mock.getCharacteristics.return_value = [attribute]
-
-        btle_mock.Peripheral.return_value = device_mock
+    def test_send_color_change_packet(self, connection_mock):
+        connection_mock.return_value = self.connection
 
         led = LedRgb('mac value')
         led.set_state({'state': 'ON', 'color': {'r': 5, 'g': 255, 'b': 7}})
 
-        attribute.write.assert_called_with(b'\x7e\x00\x05\x03\x05\xff\x07\x00\xef')
+        self.handle.write.assert_called_with(b'\x7e\x00\x05\x03\x05\xff\x07\x00\xef')
 
-    def test_send_brightness_change_packet(self, btle_mock):
-        attribute = self._build_characteristic_mock()
-        device_mock = Mock()
-        device_mock.getCharacteristics.return_value = [attribute]
-
-        btle_mock.Peripheral.return_value = device_mock
+    def test_send_brightness_change_packet(self, connection_mock):
+        connection_mock.return_value = self.connection
 
         led = LedRgb('mac value')
         led.set_state({'state': 'ON', 'brightness': 50})
 
-        attribute.write.assert_called_with(b'\x7e\x00\x01\x32\x00\x00\x00\x00\xef')
+        self.handle.write.assert_called_with(b'\x7e\x00\x01\x32\x00\x00\x00\x00\xef')
 
-    def test_send_effect_change_packet(self, btle_mock):
-        attribute = self._build_characteristic_mock()
-        device_mock = Mock()
-        device_mock.getCharacteristics.return_value = [attribute]
-
-        btle_mock.Peripheral.return_value = device_mock
+    def test_send_effect_change_packet(self, connection_mock):
+        connection_mock.return_value = self.connection
 
         led = LedRgb('mac value')
         led.set_state({'state': 'ON', 'effect': 'CROSSFADE_WHITE'})
 
-        attribute.write.assert_called_with(b'\x7e\x00\x03\x91\x03\x00\x00\x00\xef')
+        self.handle.write.assert_called_with(b'\x7e\x00\x03\x91\x03\x00\x00\x00\xef')
 
-    def test_effect_list(self, btle_mock):
+    def test_call_disconnect_on_packet_sent(self, connection_mock):
+        connection_mock.return_value = self.connection
+
+        led = LedRgb('mac value')
+        led.set_state({'state': 'ON'})
+
+        self.connection.disconnect.assert_called_once()
+
+    def test_log_error_on_connection_error(self, connection_mock):
+        def throw_error():
+            raise BTConnectError('Test error')
+
+        connection_mock.return_value = self.connection
+        self.connection.get_handle.side_effect = throw_error
+
+        with self.assertLogs('device.elk_bledom', level='DEBUG') as cm:
+            led = LedRgb('mac value')
+            led.set_state({'state': 'ON'})
+
+        self.assertEqual(
+            ['ERROR:device.elk_bledom:BT connection error: Test error'],
+            cm.output
+        )
+
+    def test_effect_list(self, _):
         self.assertListEqual(
             [
                 'RED',
@@ -101,10 +112,3 @@ class TestCommands(TestCase):
             ],
             Effect.get_effect_list()
         )
-
-    @staticmethod
-    def _build_characteristic_mock():
-        attribute = Mock()
-        attribute.propertiesToString.return_value = 'READ WRITE NO RESPONSE'
-        return attribute
-

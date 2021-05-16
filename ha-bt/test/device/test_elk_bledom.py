@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 from device.elk_bledom import LedRgb, Effect
 from device.connection import BTConnectError
+import test.utils as utils
 
 
 @patch("device.elk_bledom.Connection")
@@ -79,36 +80,6 @@ class TestCommands(TestCase):
 
     def test_effect_list(self, _):
         self.assertListEqual(
-            [
-                'RED',
-                'BLUE',
-                'GREEN',
-                'CYAN',
-                'YELLOW',
-                'MAGENTA',
-                'WHITE',
-                'JUMP_RED_GREEN_BLUE',
-                'JUMP_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE',
-                'CROSSFADE_RED',
-                'CROSSFADE_GREEN',
-                'CROSSFADE_BLUE',
-                'CROSSFADE_YELLOW',
-                'CROSSFADE_CYAN',
-                'CROSSFADE_MAGENTA',
-                'CROSSFADE_WHITE',
-                'CROSSFADE_RED_GREEN',
-                'CROSSFADE_RED_BLUE',
-                'CROSSFADE_GREEN_BLUE',
-                'CROSSFADE_RED_GREEN_BLUE',
-                'CROSSFADE_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE',
-                'BLINK_RED',
-                'BLINK_GREEN',
-                'BLINK_BLUE',
-                'BLINK_YELLOW',
-                'BLINK_CYAN',
-                'BLINK_MAGENTA',
-                'BLINK_WHITE',
-                'BLINK_RED_GREEN_BLUE_YELLOW_CYAN_MAGENTA_WHITE',
-            ],
+            utils.ELK_BLEDOM_EFFECT_LIST,
             Effect.get_effect_list()
         )

@@ -1,6 +1,6 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
-from device.elk import Led
+from device.led_rgb import LedRgb
 import test.utils as utils
 
 
@@ -8,7 +8,7 @@ class TestLedDevice(TestCase):
 
     def test_send_discovery_config_on_connect(self):
         bridge = Mock()
-        device = Led(TestConfig())
+        device = LedRgb(TestConfig())
 
         device.connect(bridge)
 
@@ -30,7 +30,7 @@ class TestLedDevice(TestCase):
 
     def test_call_bridge_add_listener_on_connect(self):
         bridge = Mock()
-        device = Led(TestConfig())
+        device = LedRgb(TestConfig())
 
         device.connect(bridge)
 
@@ -39,15 +39,15 @@ class TestLedDevice(TestCase):
             device.on_state_update_received
         )
 
-    @patch('device.elk.LedRgb')
+    @patch('device.led_rgb.Led')
     def test_build_driver_with_device_MAC(self, driver_mock):
-        Led(TestConfig)
+        LedRgb(TestConfig)
 
         driver_mock.assert_called_with(TestConfig.MAC)
 
-    @patch('device.elk.LedRgb')
+    @patch('device.led_rgb.Led')
     def test_call_driver_set_state_on_state_update(self, driver_mock):
-        device = Led(TestConfig())
+        device = LedRgb(TestConfig())
         device.connect(Mock())
 
         device.on_state_update_received({"foo": "new_state"})
@@ -56,10 +56,10 @@ class TestLedDevice(TestCase):
 
         driver.set_state.assert_called_with({"foo": "new_state"})
 
-    @patch('device.elk.LedRgb')
+    @patch('device.led_rgb.Led')
     def test_send_back_applied_state(self, driver_mock):
         bridge = Mock()
-        device = Led(TestConfig())
+        device = LedRgb(TestConfig())
         device.connect(bridge)
 
         device.on_state_update_received(

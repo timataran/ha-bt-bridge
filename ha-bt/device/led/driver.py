@@ -1,12 +1,12 @@
 import logging
-from device.connection import Connection, BTConnectError
+from device.led.connection import Connection, BTConnectError
 
 _LOGGER = logging.getLogger(__name__)
 
 ZERO = b'\x00'
 
 
-class LedRgb:
+class Led:
     def __init__(self, mac):
         self.connection = Connection(mac)
 

@@ -1,10 +1,10 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch
-from device.connection import Connection, BTConnectError
+from device.led.connection import Connection, BTConnectError
 from bluepy.btle import BTLEDisconnectError
 
 
-@patch("device.connection.bluepy.btle")
+@patch("device.led.connection.bluepy.btle")
 class TestConnection(TestCase):
 
     def test_get_device_by_mac(self, btle_mock):

@@ -1,10 +1,10 @@
-from device.elk_bledom import LedRgb, Effect
+from device.led.driver import Led, Effect
 
 
-class Led:
+class LedRgb:
     def __init__(self, config):
         self.config = config
-        self.driver = LedRgb(config.MAC)
+        self.driver = Led(config.MAC)
         self.config_topic = 'homeassistant/light/rgb_stripe_one/config'
         self.state_topic = 'homeassistant/light/rgb_stripe_one/state'
         self.command_topic = 'homeassistant/light/rgb_stripe_one/set'

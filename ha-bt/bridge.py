@@ -30,7 +30,7 @@ class Bridge:
             topic_listener(json.loads(payload))
 
     @staticmethod
-    def _on_connect(self, client, userdata, flags, rc):
+    def _on_connect(client, userdata, flags, rc):
         if rc == 0:
             _LOGGER.info("Connected to MQTT Broker!")
         else:
@@ -42,7 +42,10 @@ class Bridge:
             mqtt_client.username_pw_set(config.username, config.password)
             mqtt_client.on_connect = self._on_connect
             mqtt_client.on_message = self._on_message
-            mqtt_client.connect(config.broker, config.port, keepalive=config.keepalive)
+
+            connect_attributes = {"keepalive": config.keepalive} if hasattr(config, 'keepalive') else {}
+
+            mqtt_client.connect(config.broker, config.port, **connect_attributes)
             return mqtt_client
         except Exception as err:
             raise MqttConnectError(err)

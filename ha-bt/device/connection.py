@@ -20,6 +20,8 @@ class Connection:
     def disconnect(self):
         if self.device is not None:
             self.device.disconnect()
+            self.device = None
+            self.handle = None
 
     def _fetch_handle_from_device(self):
         self.device = bluepy.btle.Peripheral(self.mac)

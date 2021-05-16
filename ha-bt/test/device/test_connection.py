@@ -67,6 +67,17 @@ class TestConnection(TestCase):
 
         device.disconnect.assert_called()
 
+    def test_set_device_handle_none_on_disconnect(self, btle_mock):
+        device = self._build_peripheral_mock()
+        btle_mock.Peripheral.return_value = device
+
+        connection = Connection('mac')
+        connection.get_handle()
+        connection.disconnect()
+
+        self.assertIsNone(connection.handle)
+        self.assertIsNone(connection.device)
+
     def _build_peripheral_mock(self, characteristics=None):
         if characteristics is None:
             characteristics = [self._build_characteristic_mock()]

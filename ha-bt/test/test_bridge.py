@@ -8,6 +8,8 @@ class TestConnection(TestCase):
         self.config = TestConfig()
 
     def test_throw_on_connection_error(self):
+        config = self.config
+        setattr(config, 'keepalive', 0.1)
         with self.assertRaises(MqttConnectError):
             Bridge(self.config)
 
@@ -20,7 +22,7 @@ class TestConnection(TestCase):
 
         with self.assertRaises(MqttConnectError):
             response_code = 1
-            mqtt_client.on_connect(None, None, None, None, response_code)
+            mqtt_client.on_connect(None, None, None, response_code)
 
     @patch('bridge.mqtt')
     def test_log_message_on_connect(self, mqtt_mock):
@@ -31,7 +33,7 @@ class TestConnection(TestCase):
 
         with self.assertLogs('bridge', level='INFO') as cm:
             response_code = 0
-            mqtt_client.on_connect(None, None, None, None, response_code)
+            mqtt_client.on_connect(None, None, None, response_code)
 
         self.assertEqual(
             ['INFO:bridge:Connected to MQTT Broker!'],
@@ -104,4 +106,3 @@ class TestConfig:
     port = 1883
     username = 'test'
     password = 'test'
-    keepalive = 0.1

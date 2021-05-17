@@ -1,18 +1,18 @@
 import logging
-from config import Config
+from config_loader import ConfigLoader
 from bridge import Bridge
 from device.led_rgb import LedRgb
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 _LOGGER = logging.getLogger('ha-bt')
 
-_CONFIG = Config()
-
 
 def run():
-    bridge = Bridge(_CONFIG.MQTT)
-    device = LedRgb(_CONFIG.device)
-    device.connect(bridge)
+    config = ConfigLoader().load('./configuration.yaml')
+    bridge = Bridge(config.MQTT)
+    for device_config in config.devices:
+        device = LedRgb(device_config)
+        device.connect(bridge)
     bridge.start()
 
 

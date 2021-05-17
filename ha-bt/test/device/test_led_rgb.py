@@ -13,13 +13,13 @@ class TestLedDevice(TestCase):
         device.connect(bridge)
 
         bridge.send.assert_called_with(
-            'homeassistant/light/rgb_stripe_one/config',
+            'homeassistant/light/unique_id/config',
             {
                 "schema": "json",
-                "name": "RGB stripe test",
-                "command_topic": 'homeassistant/light/rgb_stripe_one/set',
-                "state_topic": 'homeassistant/light/rgb_stripe_one/state',
-                "unique_id": "rgb_stripe_one",
+                "name": "Friendly name",
+                "command_topic": 'homeassistant/light/unique_id/set',
+                "state_topic": 'homeassistant/light/unique_id/state',
+                "unique_id": "unique_id",
                 "brightness": True,
                 "brightness_scale": 100,
                 "rgb": True,
@@ -35,7 +35,7 @@ class TestLedDevice(TestCase):
         device.connect(bridge)
 
         bridge.add_listener.assert_called_with(
-            'homeassistant/light/rgb_stripe_one/set',
+            'homeassistant/light/unique_id/set',
             device.on_state_update_received
         )
 
@@ -57,7 +57,7 @@ class TestLedDevice(TestCase):
         driver.set_state.assert_called_with({"foo": "new_state"})
 
     @patch('device.led_rgb.Led')
-    def test_send_back_applied_state(self, driver_mock):
+    def test_send_back_applied_state(self, _):
         bridge = Mock()
         device = LedRgb(TestConfig())
         device.connect(bridge)
@@ -81,4 +81,7 @@ class TestLedDevice(TestCase):
 
 
 class TestConfig:
-    MAC = 'mac_value'
+    MAC = 'device_mac'
+    discovery_prefix = 'homeassistant'
+    unique_id = 'unique_id'
+    name = 'Friendly name'

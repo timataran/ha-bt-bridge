@@ -6,6 +6,13 @@ class MqttConfig:
     topic = 'bt-bridge'
 
 
+class LedConfig:
+    MAC = 'be:58:c0:00:6d:fc'
+    discovery_prefix = 'homeassistant'
+    unique_id = 'bt_led_light'
+    name = 'Bluetooth LED light'
+
+
 class Config:
     MQTT = MqttConfig()
-    MAC = 'aa:bb:22:33:44:55'
+    device = LedConfig()

@@ -11,7 +11,7 @@ _CONFIG = Config()
 
 def run():
     bridge = Bridge(_CONFIG.MQTT)
-    device = LedRgb(_CONFIG)
+    device = LedRgb(_CONFIG.device)
     device.connect(bridge)
     bridge.start()
 

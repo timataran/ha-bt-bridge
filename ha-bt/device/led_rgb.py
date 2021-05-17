@@ -5,9 +5,9 @@ class LedRgb:
     def __init__(self, config):
         self.config = config
         self.driver = Led(config.MAC)
-        self.config_topic = 'homeassistant/light/rgb_stripe_one/config'
-        self.state_topic = 'homeassistant/light/rgb_stripe_one/state'
-        self.command_topic = 'homeassistant/light/rgb_stripe_one/set'
+        self.config_topic = self._build_topic('config')
+        self.state_topic = self._build_topic('state')
+        self.command_topic = self._build_topic('set')
         self.bridge = None
 
     def connect(self, bridge):
@@ -25,10 +25,10 @@ class LedRgb:
     def _send_discovery_config(self):
         config = {
             "schema": "json",
-            "name": "RGB stripe test",
+            "name": self.config.name,
             "command_topic": self.command_topic,
             "state_topic": self.state_topic,
-            "unique_id": "rgb_stripe_one",
+            "unique_id": self.config.unique_id,
             "brightness": True,
             "brightness_scale": 100,
             "rgb": True,
@@ -39,3 +39,6 @@ class LedRgb:
 
     def _send_new_state(self, state):
         self.bridge.send(self.state_topic, state)
+
+    def _build_topic(self, name):
+        return f'{self.config.discovery_prefix}/light/{self.config.unique_id}/{name}'

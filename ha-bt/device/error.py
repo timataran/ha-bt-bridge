@@ -1,0 +1,2 @@
+class BTConnectError(Exception):
+    pass

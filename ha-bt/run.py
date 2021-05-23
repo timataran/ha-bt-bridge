@@ -2,7 +2,7 @@ import logging
 from config_loader import ConfigLoader
 from timer import JobRunner
 from bridge import Bridge
-from device.led_rgb import LedRgb
+import device.factory as device_factory
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 _LOGGER = logging.getLogger('ha-bt')
@@ -15,9 +15,12 @@ def run():
     job_runner.start()
 
     bridge = Bridge(config.MQTT)
+
     for device_config in config.devices:
-        device = LedRgb(device_config)
-        device.connect(bridge)
+        device = device_factory.build_device(device_config)
+        if device is not None:
+            device.connect(bridge)
+
     bridge.start()
 
 

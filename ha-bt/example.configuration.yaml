@@ -5,6 +5,9 @@ mqtt:
   password: password
   discovery_prefix: home_assistant
 
+timer:
+  sleep_seconds: 3
+
 device:
   - type: led_rgb
     MAC: be:58:c0:00:6d:fc

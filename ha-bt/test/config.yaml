@@ -15,4 +15,7 @@ device:
     unique_id: bt_led_light_two
     name: Second BT LED light
 
+timer:
+  sleep_seconds: 2
+
 

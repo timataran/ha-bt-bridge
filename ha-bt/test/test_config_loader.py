@@ -38,3 +38,6 @@ class TestConfigLoader(TestCase):
             self.assertEqual(expected_devices[idx]['unique_id'], devices[idx].unique_id)
             self.assertEqual(expected_devices[idx]['name'], devices[idx].name)
             self.assertEqual(expected_devices[idx]['discovery_prefix'], devices[idx].discovery_prefix)
+
+        timer = config.timer
+        self.assertEqual(2, timer.sleep_seconds)

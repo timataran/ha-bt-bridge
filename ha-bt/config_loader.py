@@ -14,10 +14,12 @@ class ConfigLoader:
 
         mqtt_config = self._build_mqtt_config()
         devices = self._build_devices_config()
+        timer = self._build_timer_config()
 
         config = Config()
         setattr(config, 'MQTT', mqtt_config)
         setattr(config, 'devices', devices)
+        setattr(config, 'timer', timer)
 
         return config
 
@@ -47,6 +49,12 @@ class ConfigLoader:
             devices.append(device_config)
 
         return devices
+
+    def _build_timer_config(self):
+        config = Config()
+        config_data = self.yaml_content.get('timer')
+        setattr(config, 'sleep_seconds', config_data.get('sleep_seconds'))
+        return config
 
 
 class Config:

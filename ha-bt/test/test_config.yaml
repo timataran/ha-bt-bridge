@@ -14,6 +14,11 @@ device:
     MAC: ba:34:d8:00:8f:bb
     unique_id: bt_led_light_two
     name: Second BT LED light
+  - type: mitemp2
+    MAC: a4:c1:38:15:91:10
+    unique_id: 'mitemp_sensor_one'
+    name: 'First MiTemperature2 sensor'
+    poll_period: 180
 
 timer:
   sleep_seconds: 2

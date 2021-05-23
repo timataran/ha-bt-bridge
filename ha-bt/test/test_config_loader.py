@@ -6,7 +6,7 @@ class TestConfigLoader(TestCase):
 
     def test_load_test_config(self):
         loader = ConfigLoader()
-        config = loader.load('test/config.yaml')
+        config = loader.load('test/test_config.yaml')
 
         self.assertEqual('192.168.0.1', config.MQTT.broker)
         self.assertEqual(1883, config.MQTT.port)
@@ -29,15 +29,21 @@ class TestConfigLoader(TestCase):
                 "unique_id": 'bt_led_light_two',
                 "name": 'Second BT LED light',
                 "discovery_prefix": 'home_assistant'
+            },
+            {
+                "type": 'mitemp2',
+                "MAC": 'a4:c1:38:15:91:10',
+                "unique_id": 'mitemp_sensor_one',
+                "name": 'First MiTemperature2 sensor',
+                "poll_period": 180,
+                "discovery_prefix": 'home_assistant'
             }
         ]
 
-        for idx in [0, 1]:
-            self.assertEqual(expected_devices[idx]['type'], devices[idx].type)
-            self.assertEqual(expected_devices[idx]['MAC'], devices[idx].MAC)
-            self.assertEqual(expected_devices[idx]['unique_id'], devices[idx].unique_id)
-            self.assertEqual(expected_devices[idx]['name'], devices[idx].name)
-            self.assertEqual(expected_devices[idx]['discovery_prefix'], devices[idx].discovery_prefix)
+        for idx in [0-2]:
+            expected_config = expected_devices[idx]
+            for key in expected_config.keys():
+                self.assertEqual(expected_config[key], getattr(devices[idx], key))
 
         timer = config.timer
         self.assertEqual(2, timer.sleep_seconds)

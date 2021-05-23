@@ -40,7 +40,7 @@ class TestConfigLoader(TestCase):
             }
         ]
 
-        for idx in [0-2]:
+        for idx in [0, 1, 2]:
             expected_config = expected_devices[idx]
             for key in expected_config.keys():
                 self.assertEqual(expected_config[key], getattr(devices[idx], key))

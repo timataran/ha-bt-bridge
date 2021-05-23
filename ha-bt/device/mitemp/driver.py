@@ -29,5 +29,5 @@ class Thermometer:
             "temperature": temperature,
             "humidity": humidity,
             "voltage": voltage,
-            "battery_level": battery_level
+            "battery": battery_level
         }

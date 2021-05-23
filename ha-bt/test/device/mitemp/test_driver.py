@@ -26,7 +26,7 @@ class TestConnection(TestCase):
                 "temperature": 24.7,
                 "humidity": 58,
                 "voltage": 3.033,
-                "battery_level": 93
+                "battery": 93
             },
             result
         )

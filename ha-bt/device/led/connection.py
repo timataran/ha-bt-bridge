@@ -1,5 +1,6 @@
 import bluepy.btle
 from bluepy.btle import BTLEDisconnectError
+from device.error import BTConnectError
 
 
 class Connection:
@@ -33,7 +34,3 @@ class Connection:
                 return handle
 
         raise BTConnectError('failed to retrieve writable attribute')
-
-
-class BTConnectError(Exception):
-    pass

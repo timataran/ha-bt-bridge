@@ -39,6 +39,18 @@ class TestLedDevice(TestCase):
             device.on_state_update_received
         )
 
+    def test_log_info_on_connect(self):
+        bridge = Mock()
+        device = LedRgb(TestConfig())
+
+        with self.assertLogs('device.base', 'INFO') as log_context:
+            device.connect(bridge)
+
+        self.assertEqual(
+            ["INFO:device.base:LedRgb device with MAC device_mac connected to bridge"],
+            log_context.output
+        )
+
     @patch('device.led_rgb.Led')
     def test_build_driver_with_device_MAC(self, driver_mock):
         LedRgb(TestConfig)
@@ -81,6 +93,7 @@ class TestLedDevice(TestCase):
 
 
 class TestConfig:
+    type = 'LedRgb'
     MAC = 'device_mac'
     discovery_prefix = 'homeassistant'
     unique_id = 'unique_id'

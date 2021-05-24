@@ -1,17 +1,16 @@
+from device.base import DeviceBase
 from device.led.driver import Led, Effect
 
 
-class LedRgb:
+class LedRgb(DeviceBase):
     def __init__(self, config):
-        self.config = config
+        super().__init__(config)
         self.driver = Led(config.MAC)
         self.config_topic = self._build_topic('config')
         self.state_topic = self._build_topic('state')
         self.command_topic = self._build_topic('set')
-        self.bridge = None
 
-    def connect(self, bridge):
-        self.bridge = bridge
+    def _connect_to_bridge(self):
         self.bridge.add_listener(self.command_topic, self.on_state_update_received)
 
         self._send_discovery_config()

@@ -1,4 +1,5 @@
 import logging
+from timeout_decorator import timeout, TimeoutError
 import schedule
 from device.base import DeviceBase
 from device.mitemp.driver import Thermometer
@@ -17,11 +18,24 @@ class MiTemp2(DeviceBase):
         self._schedule_status_send()
 
     def _send_status(self):
-        device = Thermometer(self.config.MAC)
-        data = device.read()
-        if data is not None:
-            _LOGGER.debug(f'Send {self.config.unique_id} data: {data}')
-            self.bridge.send(self.state_topic, data)
+        try:
+            data = self._read_status()
+            if data is not None:
+                _LOGGER.debug(f'Send {self.config.unique_id} data: {data}')
+                self.bridge.send(self.state_topic, data)
+        except TimeoutError as err:
+            _LOGGER.error(err)
+
+    def _read_status(self):
+        timeout_value = self.config.read_timeout if hasattr(self.config, 'read_timeout') else 10
+        by_signals = self.config.timeout_by_signals if hasattr(self.config, 'timeout_by_signals') else False
+
+        @timeout(timeout_value, use_signals=by_signals)
+        def read_with_timeout():
+            device = Thermometer(self.config.MAC)
+            return device.read()
+
+        return read_with_timeout()
 
     def _send_discovery_configs(self):
         for topic, config in self._get_config_topics():

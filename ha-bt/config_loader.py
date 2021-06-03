@@ -46,6 +46,7 @@ class ConfigLoader:
             setattr(device_config, 'unique_id', device.get('unique_id'))
             setattr(device_config, 'name', device.get('name'))
             setattr(device_config, 'poll_period', device.get('poll_period'))
+            setattr(device_config, 'read_timeout', device.get('read_timeout'))
 
             devices.append(device_config)
 

@@ -36,7 +36,8 @@ class TestConfigLoader(TestCase):
                 "unique_id": 'mitemp_sensor_one',
                 "name": 'First MiTemperature2 sensor',
                 "poll_period": 180,
-                "discovery_prefix": 'home_assistant'
+                "discovery_prefix": 'home_assistant',
+                "read_timeout": 12
             }
         ]
 

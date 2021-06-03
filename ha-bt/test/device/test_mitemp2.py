@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import Mock, patch, call
 from device.mitemp2 import MiTemp2
+import time
 
 
 @patch('device.mitemp2.Thermometer')
@@ -91,6 +92,25 @@ class TestLedDevice(TestCase):
 
         bridge.send.assert_called()
 
+    def test_log_error_reading_on_lasts_too_long(self, driver_mock):
+
+        def long_read():
+            time.sleep(5)
+
+        driver = driver_mock.return_value
+        driver.read.side_effect = long_read
+
+        bridge = Mock()
+        device = MiTemp2(TestConfig())
+
+        with self.assertLogs('device.mitemp2', level='ERROR') as log_context:
+            device.connect(bridge)
+
+        self.assertEqual(
+            ["ERROR:device.mitemp2:'Timed Out'"],
+            log_context.output
+        )
+
 
 class TestConfig:
     type = 'MiTemp2'
@@ -99,3 +119,5 @@ class TestConfig:
     unique_id = 'unique_id'
     name = 'Friendly name'
     poll_period = 120
+    read_timeout = 0.1
+    timeout_by_signals = True

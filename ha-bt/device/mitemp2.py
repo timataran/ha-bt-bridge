@@ -27,8 +27,8 @@ class MiTemp2(DeviceBase):
             _LOGGER.error(err)
 
     def _read_status(self):
-        timeout_value = hasattr(self.config, 'read_timeout') if self.config.read_timeout is not None else 10
-        by_signals = hasattr(self.config, 'timeout_by_signals') if self.config.timeout_by_signals is not None else False
+        timeout_value = self.config.read_timeout if hasattr(self.config, 'read_timeout') else 10
+        by_signals = self.config.timeout_by_signals if hasattr(self.config, 'timeout_by_signals') else False
 
         @timeout(timeout_value, use_signals=by_signals)
         def read_with_timeout():

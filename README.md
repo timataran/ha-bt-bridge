@@ -11,7 +11,7 @@ After installing dependencies application can be launched:
 
 ```
 cd /<path-to-sources>/ha-bt-bridge/ha-bt
-sudo nohup python run.py >> ha-bt.log &
+sudo nohup python ha_bt.py >> ha_bt.log &
 ```
 
 ## Configuration
@@ -34,20 +34,23 @@ It describes connection to MQTT broker. Parameters:
 
 ### timer
 
-Parameter `sleep_seconds` defines period in seconds between scheduled jobs execution.
+Parameter `sleep_seconds` defines period in seconds between scheduled sensor read attempts.
 
 ### device
 
 Section contains list of devices to connect. Parameters:
-| parameter   | description                                            |
-|-------------|--------------------------------------------------------|
-| type        | `LedRgb` or `MiTemp2`                                  |
-| MAC         | device address                                         |
-| unique_id   | unique across HA devices identifier                    |
-| name        | human-readable device name                             |
-| poll_period | only for MiTemp2, period in seconds between sensor read|
+
+| parameter    | description                                            |
+|--------------|--------------------------------------------------------|
+| type         | `LedRgb` or `MiTemp2`                                  |
+| MAC          | device address                                         |
+| unique_id    | unique across HA devices identifier                    |
+| name         | human-readable device name                             |
+| poll_period  | only for MiTemp2, period in seconds between sensor read|
+| read_timeout | only for MiTemp2, sensor read timeout in seconds       |
 
 Supported types:
+
 | Type      | Bluetooth device name |                              |
 |-----------|-----------------------|------------------------------|
 | `LedRgb`  | ELK-BLEDOM            | rgb strip bluetooth receiver |

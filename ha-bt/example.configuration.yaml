@@ -22,3 +22,4 @@ device:
     unique_id: 'mitemp_sensor_one'
     name: 'First MiTemperature2 sensor'
     poll_period: 180
+    read_timeout: 12

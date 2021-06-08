@@ -16,9 +16,6 @@ class Led:
                 self._switch_power(new_state['state'])
             else:
                 self._set_light(new_state)
-
-        except BTConnectError as err:
-            _LOGGER.error(f'BT connection error: {err}')
         finally:
             self.connection.disconnect()
 
@@ -49,8 +46,21 @@ class Led:
 
     def _send_packet(self, command, sub_command, arg_1=ZERO, arg_2=ZERO, arg_3=ZERO):
         packet = b'\x7e\x00' + command + sub_command + arg_1 + arg_2 + arg_3 + b'\x00\xef'
-        handle = self.connection.get_handle()
-        handle.write(packet)
+        self._send_packet_with_retry(packet)
+
+    def _send_packet_with_retry(self, packet):
+        send_attempt = 0
+        while True:
+            try:
+                send_attempt += 1
+
+                handle = self.connection.get_handle()
+                handle.write(packet)
+            except BTConnectError as err:
+                _LOGGER.error(f'Command send attempt {send_attempt} failed with error: {err}')
+                if send_attempt < 3:
+                    continue
+            break
 
 
 class Power:

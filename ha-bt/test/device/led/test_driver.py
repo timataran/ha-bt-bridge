@@ -74,9 +74,24 @@ class TestCommands(TestCase):
             led.set_state({'state': 'ON'})
 
         self.assertEqual(
-            ['ERROR:device.led.driver:BT connection error: Test error'],
+            ['ERROR:device.led.driver:Command send attempt 1 failed with error: Test error',
+             'ERROR:device.led.driver:Command send attempt 2 failed with error: Test error',
+             'ERROR:device.led.driver:Command send attempt 3 failed with error: Test error'],
             cm.output
         )
+
+    def test_retry_three_times_on_connection_error(self, connection_mock):
+        def throw_error():
+            raise BTConnectError('Test error')
+
+        connection_mock.return_value = self.connection
+        self.connection.get_handle.side_effect = throw_error
+
+        with self.assertLogs():
+            led = Led('mac value')
+            led.set_state({'state': 'ON'})
+
+        self.assertEqual(3, self.connection.get_handle.call_count)
 
     def test_effect_list(self, _):
         self.assertListEqual(

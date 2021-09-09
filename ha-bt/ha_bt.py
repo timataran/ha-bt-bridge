@@ -9,7 +9,7 @@ _LOGGER = logging.getLogger('ha-bt')
 
 
 def run():
-    config = ConfigLoader().load('./configuration.yaml')
+    config = ConfigLoader().load('config/configuration.yaml')
 
     job_runner = JobRunner(config.timer)
     job_runner.start()

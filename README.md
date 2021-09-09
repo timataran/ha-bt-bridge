@@ -16,7 +16,7 @@ sudo nohup python ha_bt.py >> ha_bt.log &
 
 ## Configuration
 
-Initial configuration can be created by copying `example.configuration.yml` with name `configuration.yml`.
+Initial configuration can be created by copying `config/example.configuration.yml` to file `config/configuration.yml`.
 
 The configuration has three sections, `mqtt`, `timer`, `device`.
 

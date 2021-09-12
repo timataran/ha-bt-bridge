@@ -1,18 +1,5 @@
 # Bluetooth devices connection to Home Assistant over MQTT
 
-## Run
-
-Packages needed to run application are listed in the `requirements.txt` .
-They can be installed with command:
-```
-pip install -r requirements.txt
-```
-After installing dependencies application can be launched:
-
-```
-cd /<path-to-sources>/ha-bt-bridge/ha-bt
-sudo nohup python ha_bt.py >> ha_bt.log &
-```
 
 ## Configuration
 
@@ -56,3 +43,30 @@ Supported types:
 | `LedRgb`  | ELK-BLEDOM            | rgb strip bluetooth receiver |
 | `MiTemp2` | LYWSD03MMC            | MiTemperature2 sensor        |
 
+
+## Run
+
+### Using docker-compose
+
+The image in repository is built for `linux/arm/v6` architecture which is suitable for Raspberry Pi 3 devices.
+Create directory structure with `docker-compose.yml` from project and your `configuration.yaml`:
+```
+├── config
+│   └── configuration.yaml
+└── docker-compose.yml
+```
+Run `docker-compose up -d` to start and `docker-compose down` to stop.
+
+### From source
+
+Packages needed to run application are listed in the `requirements.txt` .
+They can be installed with command:
+```
+pip install -r requirements.txt
+```
+After installing dependencies application can be launched:
+
+```
+cd /<path-to-sources>/ha-bt-bridge/ha-bt
+sudo nohup python ha_bt.py >> ha_bt.log &
+```

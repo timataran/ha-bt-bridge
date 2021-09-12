@@ -2,7 +2,7 @@ version: "3"
 
 services:
   ha_bt:
-    build: .
+    image: timataran/ha-bt-bridge:latest
     restart: always
     network_mode: host
     volumes:

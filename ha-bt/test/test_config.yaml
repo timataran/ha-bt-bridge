@@ -10,10 +10,12 @@ device:
     MAC: be:58:c0:00:6d:fc
     unique_id: bt_led_light_one
     name: First BT LED light
+    discovery_period: 300
   - type: led_rgb
     MAC: ba:34:d8:00:8f:bb
     unique_id: bt_led_light_two
     name: Second BT LED light
+    discovery_period: 400
   - type: mitemp2
     MAC: a4:c1:38:15:91:10
     unique_id: 'mitemp_sensor_one'

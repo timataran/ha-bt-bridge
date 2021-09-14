@@ -91,10 +91,24 @@ class TestLedDevice(TestCase):
             }
         )
 
+    @patch('device.base.schedule')
+    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock):
+        config = TestConfig()
+        device = LedRgb(config)
+
+        bridge = Mock()
+        device.connect(bridge)
+
+        schedule_mock.every.assert_any_call(config.discovery_period)
+
+        every_result = schedule_mock.every.return_value
+        every_result.seconds.do.assert_called_once_with(device._send_discovery_configs)
+
 
 class TestConfig:
     type = 'LedRgb'
     MAC = 'device_mac'
     discovery_prefix = 'homeassistant'
+    discovery_period = 600
     unique_id = 'unique_id'
     name = 'Friendly name'

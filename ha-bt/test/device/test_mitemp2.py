@@ -92,6 +92,19 @@ class TestLedDevice(TestCase):
 
         bridge.send.assert_called()
 
+    @patch('device.base.schedule')
+    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock, driver_mock):
+        config = TestConfig()
+        device = MiTemp2(config)
+
+        bridge = Mock()
+        device.connect(bridge)
+
+        schedule_mock.every.assert_any_call(config.discovery_period)
+
+        every_result = schedule_mock.every.return_value
+        every_result.seconds.do.assert_called_once_with(device._send_discovery_configs)
+
     def test_log_error_reading_on_lasts_too_long(self, driver_mock):
 
         def long_read():
@@ -116,6 +129,7 @@ class TestConfig:
     type = 'MiTemp2'
     MAC = 'device_mac'
     discovery_prefix = 'homeassistant'
+    discovery_period = 600
     unique_id = 'unique_id'
     name = 'Friendly name'
     poll_period = 120

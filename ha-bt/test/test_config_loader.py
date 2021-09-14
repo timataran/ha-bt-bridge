@@ -21,14 +21,16 @@ class TestConfigLoader(TestCase):
                 "MAC": 'be:58:c0:00:6d:fc',
                 "unique_id": 'bt_led_light_one',
                 "name": 'First BT LED light',
-                "discovery_prefix": 'home_assistant'
+                "discovery_prefix": 'home_assistant',
+                "discovery_period": 300
             },
             {
                 "type": 'led_rgb',
                 "MAC": 'ba:34:d8:00:8f:bb',
                 "unique_id": 'bt_led_light_two',
                 "name": 'Second BT LED light',
-                "discovery_prefix": 'home_assistant'
+                "discovery_prefix": 'home_assistant',
+                "discovery_period": 400
             },
             {
                 "type": 'mitemp2',
@@ -37,7 +39,8 @@ class TestConfigLoader(TestCase):
                 "name": 'First MiTemperature2 sensor',
                 "poll_period": 180,
                 "discovery_prefix": 'home_assistant',
-                "read_timeout": 12
+                "read_timeout": 12,
+                "discovery_period": 600
             }
         ]
 

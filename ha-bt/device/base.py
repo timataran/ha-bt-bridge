@@ -15,3 +15,6 @@ class DeviceBase:
 
     def _connect_to_bridge(self):
         pass
+
+    def _send_discovery_configs(self):
+        pass

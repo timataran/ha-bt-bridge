@@ -13,7 +13,7 @@ class LedRgb(DeviceBase):
     def _connect_to_bridge(self):
         self.bridge.add_listener(self.command_topic, self.on_state_update_received)
 
-        self._send_discovery_config()
+        self._send_discovery_configs()
 
     def on_state_update_received(self, state):
         self.driver.set_state(state)
@@ -21,7 +21,7 @@ class LedRgb(DeviceBase):
             state['effect'] = None
         self._send_new_state(state)
 
-    def _send_discovery_config(self):
+    def _send_discovery_configs(self):
         config = {
             "schema": "json",
             "name": self.config.name,

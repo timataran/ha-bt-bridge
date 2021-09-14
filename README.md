@@ -27,14 +27,15 @@ Parameter `sleep_seconds` defines period in seconds between scheduled sensor rea
 
 Section contains list of devices to connect. Parameters:
 
-| parameter    | description                                            |
-|--------------|--------------------------------------------------------|
-| type         | `LedRgb` or `MiTemp2`                                  |
-| MAC          | device address                                         |
-| unique_id    | unique across HA devices identifier                    |
-| name         | human-readable device name                             |
-| poll_period  | only for MiTemp2, period in seconds between sensor read|
-| read_timeout | only for MiTemp2, sensor read timeout in seconds       |
+| parameter        | description                                                     |
+|------------------|-----------------------------------------------------------------|
+| type             | `LedRgb` or `MiTemp2`                                           |
+| MAC              | device address                                                  |
+| unique_id        | unique across HA devices identifier                             |
+| name             | human-readable device name                                      |
+| discovery_period | period in seconds between discovery configs sending, default 600|
+| poll_period      | only for MiTemp2, period in seconds between sensor read         |
+| read_timeout     | only for MiTemp2, sensor read timeout in seconds                |
 
 Supported types:
 

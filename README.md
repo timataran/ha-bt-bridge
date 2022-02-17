@@ -1,5 +1,12 @@
 # Bluetooth devices connection to Home Assistant over MQTT
 
+## How it works
+
+At the moment ha-bt-bridge is standalone application that connects to MQTT broker and to 
+one or more bluetooth devices. Connection to broker and devices are being configured in its own config file. 
+Application registers devices in Home Assistant 
+using [MQTT discovery](https://www.home-assistant.io/docs/mqtt/discovery/), so there is no need 
+in additional configuration on HA side.
 
 ## Configuration
 

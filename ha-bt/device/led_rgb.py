@@ -1,11 +1,13 @@
 from device.base import DeviceBase
 from device.led.driver import Led, Effect
+from device.led.state import State
 
 
 class LedRgb(DeviceBase):
     def __init__(self, config):
         super().__init__(config)
         self.driver = Led(config.MAC)
+        self.state = State(config.MAC)
         self.config_topic = self._build_topic('config')
         self.state_topic = self._build_topic('state')
         self.command_topic = self._build_topic('set')
@@ -14,12 +16,14 @@ class LedRgb(DeviceBase):
         self.bridge.add_listener(self.command_topic, self.on_state_update_received)
 
         self._send_discovery_configs()
+        last_state = self.state.read()
+        if last_state is not None:
+            self.on_state_update_received(last_state)
 
-    def on_state_update_received(self, state):
-        self.driver.set_state(state)
-        if state.get('color') is not None:
-            state['effect'] = None
-        self._send_new_state(state)
+    def on_state_update_received(self, state_update):
+        self.driver.set_state(state_update)
+        self.state.write(state_update)
+        self._send_updated_state(state_update)
 
     def _send_discovery_configs(self):
         config = {
@@ -36,8 +40,10 @@ class LedRgb(DeviceBase):
         }
         self.bridge.send(self.config_topic, config)
 
-    def _send_new_state(self, state):
-        self.bridge.send(self.state_topic, state)
+    def _send_updated_state(self, state_update):
+        if state_update.get('color') is not None:
+            state_update['effect'] = None
+        self.bridge.send(self.state_topic, state_update)
 
     def _build_topic(self, name):
         return f'{self.config.discovery_prefix}/light/{self.config.unique_id}/{name}'

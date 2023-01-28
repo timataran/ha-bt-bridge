@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.11
 
 COPY ./requirements.txt /
 RUN mkdir /app && mkdir /config && mkdir /logs && pip3 install --no-cache-dir -r requirements.txt

@@ -108,7 +108,7 @@ class TestLedDevice(TestCase):
 
         state_mock.assert_called_with(TestConfig.MAC)
 
-    def test_call_driver_set_state_on_state_update(self, state_mock, driver_mock):
+    def test_write_new_state_on_state_update(self, state_mock, driver_mock):
         device = LedRgb(TestConfig())
         device.connect(Mock())
 
@@ -142,6 +142,7 @@ class TestLedDevice(TestCase):
             device.state_topic,
             {"foo": "old_state"}
         )
+
 
 class TestConfig:
     type = 'LedRgb'

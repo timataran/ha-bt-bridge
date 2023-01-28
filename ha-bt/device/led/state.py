@@ -1,6 +1,7 @@
 import sqlite3
 import json
 import logging
+from typing import Optional
 
 DB_FILE = 'data/led_rgb_state.db'
 _LOGGER = logging.getLogger(__name__)
@@ -36,7 +37,7 @@ class State:
         ''', (self.mac, state_json, state_json))
 
     @with_connection
-    def read(self, connection=None) -> dict:
+    def read(self, connection=None) -> Optional[dict]:
         cur = connection.cursor()
         cur.execute("SELECT state FROM last_known_state WHERE mac=?", (self.mac,))
         data = cur.fetchone()

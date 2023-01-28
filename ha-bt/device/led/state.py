@@ -31,10 +31,11 @@ class State:
     def write(self, state: dict, connection=None) -> None:
         state_json = json.dumps(state)
         cur = connection.cursor()
-        cur.execute('''
-        INSERT INTO last_known_state (mac,state) VALUES (?,?)
-            ON CONFLICT DO UPDATE SET state=?
-        ''', (self.mac, state_json, state_json))
+        cur.execute(
+            '''INSERT INTO last_known_state (mac,state) VALUES (?,?)
+                    ON CONFLICT(mac) DO UPDATE SET state=excluded.state''',
+            (self.mac, state_json)
+        )
 
     @with_connection
     def read(self, connection=None) -> Optional[dict]:

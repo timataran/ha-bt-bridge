@@ -11,7 +11,7 @@ class TestState(TestCase):
     def test_restore_saved_state(self):
         state = State("mac-value")
         initial_state = {"key1": "value1", "key2": "value2"}
-        state.write(initial_state)
+        state.update(initial_state)
 
         state = State("mac-value")
         restored_state = state.read()
@@ -20,16 +20,54 @@ class TestState(TestCase):
 
     def test_override_state(self):
         state = State("mac-value")
-        state.write({"key1": "value1"})
-        state.write({"key1": "value2"})
+        state.update({"key1": "value1"})
+        state.update({"key1": "value2"})
 
         restored_state = state.read()
 
         self.assertDictEqual({"key1": "value2"}, restored_state)
 
+    def test_merge_state_on_update(self):
+        state = State("mac-value")
+        state.update({'state': 'ON', 'brightness': 52})
+        state.update({"state": "OFF", "color": {"r": 0, "g": 63, "b": 255}})
+
+        self.assertDictEqual(
+            {
+                'state': 'OFF',
+                'brightness': 52,
+                'color': {"r": 0, "g": 63, "b": 255}
+            },
+            state.read())
+
+    def test_suppress_effect_on_update_ws_color(self):
+        state = State("mac-value")
+        state.update({'state': 'ON', 'effect': 'MAGENTA'})
+        state.update({"state": "ON", "color": {"r": 0, "g": 63, "b": 255}})
+
+        self.assertDictEqual(
+            {
+                'state': 'ON',
+                'color': {"r": 0, "g": 63, "b": 255}
+            },
+            state.read())
+
+    def test_suppress_color_on_update_ws_effect(self):
+        state = State("mac-value")
+        state.update({"state": "ON", 'brightness': 52, "color": {"r": 0, "g": 63, "b": 255}})
+        state.update({'state': 'ON', 'effect': 'MAGENTA'})
+
+        self.assertDictEqual(
+            {
+                'state': 'ON',
+                'brightness': 52,
+                'effect': 'MAGENTA'
+            },
+            state.read())
+
     def test_store_states_by_mac(self):
-        State("mac1").write({"name": "Alice"})
-        State("mac2").write({"name": "Bob"})
+        State("mac1").update({"name": "Alice"})
+        State("mac2").update({"name": "Bob"})
 
         self.assertDictEqual({"name": "Alice"}, State("mac1").read())
         self.assertDictEqual({"name": "Bob"}, State("mac2").read())

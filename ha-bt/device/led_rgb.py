@@ -14,18 +14,19 @@ class LedRgb(DeviceBase):
 
     def _connect_to_bridge(self):
         self.bridge.add_listener(self.command_topic, self.on_state_update_received)
-
         self._send_discovery_configs()
-        last_state = self.state.read()
-        if last_state is not None:
-            self.on_state_update_received(last_state)
+        self._send_state_to_driver()
 
     def on_state_update_received(self, state_update):
-        self.driver.set_state(state_update)
-        self.state.write(state_update)
-        self._send_updated_state(state_update)
+        self.state.update(state_update)
+        self._send_state_to_driver()
+        self._send_state_to_bridge()
 
     def _send_discovery_configs(self):
+        self._send_discovery_to_bridge()
+        self._send_state_to_bridge()
+
+    def _send_discovery_to_bridge(self):
         config = {
             "schema": "json",
             "name": self.config.name,
@@ -40,10 +41,15 @@ class LedRgb(DeviceBase):
         }
         self.bridge.send(self.config_topic, config)
 
-    def _send_updated_state(self, state_update):
-        if state_update.get('color') is not None:
-            state_update['effect'] = None
-        self.bridge.send(self.state_topic, state_update)
+    def _send_state_to_bridge(self):
+        last_state = self.state.read()
+        if last_state is not None:
+            self.bridge.send(self.state_topic, last_state)
+
+    def _send_state_to_driver(self):
+        last_state = self.state.read()
+        if last_state is not None:
+            self.driver.set_state(last_state)
 
     def _build_topic(self, name):
         return f'{self.config.discovery_prefix}/light/{self.config.unique_id}/{name}'

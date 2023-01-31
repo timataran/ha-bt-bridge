@@ -21,31 +21,58 @@ def with_connection(method):
 class State:
     def __init__(self, mac: str):
         self.mac: str = mac
+        self.value_update: Optional[dict] = None
         self.value: Optional[dict] = None
         self._init_db()
 
     def update(self, state_update: dict) -> None:
         self.read()
-        self._merge_update(state_update)
+        self._set_value_update(state_update)
+        self._merge_update()
         self._write_to_db()
 
     def read(self) -> Optional[dict]:
         if self.value is None:
             self.value = self._read_from_db()
 
-        return self.value
+        return self._apply_off_filter(self.value)
 
-    def _merge_update(self, state_update: dict) -> None:
+    def get_update(self) -> Optional[dict]:
+        if self.value_update is None:
+            self.read()
+
+            if self.value is not None:
+                self.value_update = {'state': self.value.get('state') or 'OFF'}
+
+        return self.value_update
+
+    def _set_value_update(self, state_update: dict) -> None:
+        if state_update.get('color') is not None:
+            state_update['effect'] = None
+
+        self.value_update = state_update
+
+    def _merge_update(self) -> None:
         if self.value is None:
             self.value = {}
 
-        if state_update.get('color') is not None:
-            self.value.pop('effect', None)
+        if self.value_update.get('color') is not None:
+            self.value['effect'] = None
 
-        if state_update.get('effect') is not None:
-            self.value.pop('color', None)
+        if self.value_update.get('effect') is not None:
+            self.value['color'] = None
 
-        self.value = self.value | state_update
+        self.value = self.value | self.value_update
+
+    @classmethod
+    def _apply_off_filter(cls, state: dict) -> Optional[dict]:
+        if state is None:
+            return state
+
+        if state.get('state') == 'OFF':
+            return {"state": "OFF"}
+        else:
+            return state
 
     @with_connection
     def _init_db(self, connection=None) -> None:

@@ -30,12 +30,34 @@ class TestState(TestCase):
     def test_merge_state_on_update(self):
         state = State("mac-value")
         state.update({'state': 'ON', 'brightness': 52})
-        state.update({"state": "OFF", "color": {"r": 0, "g": 63, "b": 255}})
+        state.update({"state": "ON", "color": {"r": 0, "g": 63, "b": 255}})
 
         self.assertDictEqual(
             {
-                'state': 'OFF',
+                'state': 'ON',
                 'brightness': 52,
+                'color': {"r": 0, "g": 63, "b": 255}
+            },
+            state.read())
+
+    def test_apply_off_filter_on_read(self):
+        state = State("mac-value")
+        state.update({'state': 'ON', "color": {"r": 3, "g": 3, "b": 3}})
+        state.update({"state": "OFF", 'effect': 'MAGENTA'})
+
+        self.assertDictEqual(
+            {'state': 'OFF'},
+            state.read()
+        )
+
+    def test_suppress_effect_in_value_ws_color(self):
+        state = State("mac-value")
+        state.update({'state': 'ON', "color": {"r": 3, "g": 3, "b": 3}})
+        state.update({"state": "ON", 'effect': 'MAGENTA', "color": {"r": 0, "g": 63, "b": 255}})
+
+        self.assertDictEqual(
+            {
+                'state': 'ON',
                 'color': {"r": 0, "g": 63, "b": 255}
             },
             state.read())

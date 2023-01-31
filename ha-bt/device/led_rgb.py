@@ -47,9 +47,9 @@ class LedRgb(DeviceBase):
             self.bridge.send(self.state_topic, last_state)
 
     def _send_state_to_driver(self):
-        last_state = self.state.read()
-        if last_state is not None:
-            self.driver.set_state(last_state)
+        state_update = self.state.get_update()
+        if state_update is not None:
+            self.driver.set_state(state_update)
 
     def _build_topic(self, name):
         return f'{self.config.discovery_prefix}/light/{self.config.unique_id}/{name}'

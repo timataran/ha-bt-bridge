@@ -4,15 +4,17 @@ from device.led_rgb import LedRgb
 import test.utils as utils
 
 
+@patch('device.led_rgb.Led')
+@patch('device.led_rgb.State')
 class TestLedDevice(TestCase):
 
-    def test_send_discovery_config_on_connect(self):
+    def test_send_discovery_config_on_connect(self, state_mock, driver_mock):
         bridge = Mock()
         device = LedRgb(TestConfig())
 
         device.connect(bridge)
 
-        bridge.send.assert_called_with(
+        bridge.send.assert_any_call(
             'homeassistant/light/unique_id/config',
             {
                 "schema": "json",
@@ -28,7 +30,7 @@ class TestLedDevice(TestCase):
             }
         )
 
-    def test_call_bridge_add_listener_on_connect(self):
+    def test_call_bridge_add_listener_on_connect(self, state_mock, driver_mock):
         bridge = Mock()
         device = LedRgb(TestConfig())
 
@@ -39,7 +41,7 @@ class TestLedDevice(TestCase):
             device.on_state_update_received
         )
 
-    def test_log_info_on_connect(self):
+    def test_log_info_on_connect(self, state_mock, driver_mock):
         bridge = Mock()
         device = LedRgb(TestConfig())
 
@@ -51,48 +53,39 @@ class TestLedDevice(TestCase):
             log_context.output
         )
 
-    @patch('device.led_rgb.Led')
-    def test_build_driver_with_device_MAC(self, driver_mock):
+    def test_build_driver_with_device_MAC(self, state_mock, driver_mock):
         LedRgb(TestConfig)
 
         driver_mock.assert_called_with(TestConfig.MAC)
 
-    @patch('device.led_rgb.Led')
-    def test_call_driver_set_state_on_state_update(self, driver_mock):
+    def test_call_driver_set_state_on_state_update(self, state_mock, driver_mock):
         device = LedRgb(TestConfig())
         device.connect(Mock())
 
-        device.on_state_update_received({"foo": "new_state"})
-
         driver = driver_mock.return_value
+        state = state_mock.return_value
+        state.read.return_value = {"foo": "state_after_update"}
 
-        driver.set_state.assert_called_with({"foo": "new_state"})
+        device.on_state_update_received({"foo": "some_state_update"})
 
-    @patch('device.led_rgb.Led')
-    def test_send_back_applied_state(self, _):
+        driver.set_state.assert_called_with({"foo": "state_after_update"})
+
+    def test_send_state_to_bridge_on_state_update(self, state_mock, driver_mock):
         bridge = Mock()
         device = LedRgb(TestConfig())
         device.connect(bridge)
+        state = state_mock.return_value
+        state.read.return_value = {"foo": "state_after_update"}
 
-        device.on_state_update_received(
-            {
-                "state": "ON",
-                "color": {"r": 255, "g": 0, "b": 63},
-                "effect": "CROSSFADE_CYAN"
-            }
-        )
+        device.on_state_update_received({"foo": "some_state_update"})
 
         bridge.send.assert_called_with(
             device.state_topic,
-            {
-                "state": "ON",
-                "color": {"r": 255, "g": 0, "b": 63},
-                "effect": None
-            }
+            {"foo": "state_after_update"}
         )
 
     @patch('device.base.schedule')
-    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock):
+    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock, state_mock, driver_mock):
         config = TestConfig()
         device = LedRgb(config)
 
@@ -103,6 +96,46 @@ class TestLedDevice(TestCase):
 
         every_result = schedule_mock.every.return_value
         every_result.seconds.do.assert_called_once_with(device._send_discovery_configs)
+
+    def test_build_state_object_with_device_MAC(self, state_mock, driver_mock):
+        LedRgb(TestConfig)
+
+        state_mock.assert_called_with(TestConfig.MAC)
+
+    def test_call_update_on_state_object_on_state_update_received(self, state_mock, driver_mock):
+        device = LedRgb(TestConfig())
+        device.connect(Mock())
+
+        device.on_state_update_received({"foo": "new_state"})
+
+        state = state_mock.return_value
+
+        state.update.assert_called_with({"foo": "new_state"})
+
+    def test_restore_state_on_connect(self, state_mock, driver_mock):
+        device = LedRgb(TestConfig())
+
+        driver = driver_mock.return_value
+        state = state_mock.return_value
+        state.read.return_value = {"foo": "old_state"}
+
+        device.connect(Mock())
+
+        driver.set_state.assert_called_with({"foo": "old_state"})
+
+    def test_send_restored_state_on_connect(self, state_mock, driver_mock):
+        bridge = Mock()
+        device = LedRgb(TestConfig())
+
+        state = state_mock.return_value
+        state.read.return_value = {"foo": "old_state"}
+
+        device.connect(bridge)
+
+        bridge.send.assert_any_call(
+            device.state_topic,
+            {"foo": "old_state"}
+        )
 
 
 class TestConfig:

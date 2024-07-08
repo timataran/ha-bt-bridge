@@ -22,7 +22,7 @@ class TestConnection(TestCase):
 
         with self.assertRaises(MqttConnectError):
             response_code = 1
-            mqtt_client.on_connect(None, None, None, response_code)
+            mqtt_client.on_connect(None, None, None, response_code, None)
 
     @patch('bridge.mqtt')
     def test_log_message_on_connect(self, mqtt_mock):
@@ -33,7 +33,7 @@ class TestConnection(TestCase):
 
         with self.assertLogs('bridge', level='INFO') as cm:
             response_code = 0
-            mqtt_client.on_connect(None, None, None, response_code)
+            mqtt_client.on_connect(None, None, None, response_code, None)
 
         self.assertEqual(
             ['INFO:bridge:Connected to MQTT Broker!'],

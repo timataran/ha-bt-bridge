@@ -24,7 +24,7 @@ class TestLedDevice(TestCase):
                 "unique_id": "unique_id",
                 "brightness": True,
                 "brightness_scale": 100,
-                "rgb": True,
+                "supported_color_modes": ["rgb"],
                 "effect": True,
                 "effect_list": utils.ELK_BLEDOM_EFFECT_LIST
             }
@@ -64,7 +64,7 @@ class TestLedDevice(TestCase):
 
         driver = driver_mock.return_value
         state = state_mock.return_value
-        state.read.return_value = {"foo": "state_after_update"}
+        state.get_update.return_value = {"foo": "state_after_update"}
 
         device.on_state_update_received({"foo": "some_state_update"})
 
@@ -117,7 +117,7 @@ class TestLedDevice(TestCase):
 
         driver = driver_mock.return_value
         state = state_mock.return_value
-        state.read.return_value = {"foo": "old_state"}
+        state.get_update.return_value = {"foo": "old_state"}
 
         device.connect(Mock())
 

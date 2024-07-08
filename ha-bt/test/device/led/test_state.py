@@ -36,7 +36,8 @@ class TestState(TestCase):
             {
                 'state': 'ON',
                 'brightness': 52,
-                'color': {"r": 0, "g": 63, "b": 255}
+                'color': {"r": 0, "g": 63, "b": 255},
+                'effect': None
             },
             state.read())
 
@@ -58,7 +59,8 @@ class TestState(TestCase):
         self.assertDictEqual(
             {
                 'state': 'ON',
-                'color': {"r": 0, "g": 63, "b": 255}
+                'color': {"r": 0, "g": 63, "b": 255},
+                'effect': None
             },
             state.read())
 
@@ -70,7 +72,8 @@ class TestState(TestCase):
         self.assertDictEqual(
             {
                 'state': 'ON',
-                'color': {"r": 0, "g": 63, "b": 255}
+                'color': {"r": 0, "g": 63, "b": 255},
+                'effect': None
             },
             state.read())
 
@@ -83,7 +86,8 @@ class TestState(TestCase):
             {
                 'state': 'ON',
                 'brightness': 52,
-                'effect': 'MAGENTA'
+                'effect': 'MAGENTA',
+                'color': None
             },
             state.read())
 

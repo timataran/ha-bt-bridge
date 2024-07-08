@@ -11,6 +11,7 @@ class LedRgb(DeviceBase):
         self.config_topic = self._build_topic('config')
         self.state_topic = self._build_topic('state')
         self.command_topic = self._build_topic('set')
+        self.color_mode = "rgb"
 
     def _connect_to_bridge(self):
         self.bridge.add_listener(self.command_topic, self.on_state_update_received)
@@ -35,7 +36,7 @@ class LedRgb(DeviceBase):
             "unique_id": self.config.unique_id,
             "brightness": True,
             "brightness_scale": 100,
-            "rgb": True,
+            "supported_color_modes": [self.color_mode],
             "effect": True,
             "effect_list": Effect.get_effect_list()
         }
@@ -44,7 +45,14 @@ class LedRgb(DeviceBase):
     def _send_state_to_bridge(self):
         last_state = self.state.read()
         if last_state is not None:
-            self.bridge.send(self.state_topic, last_state)
+            self.bridge.send(self.state_topic, self._format_state_response(last_state))
+
+    def _format_state_response(self, state: dict) -> dict:
+        if state.get('color') is None:
+            return state
+        else:
+            state['color_mode'] = self.color_mode
+            return state
 
     def _send_state_to_driver(self):
         state_update = self.state.get_update()

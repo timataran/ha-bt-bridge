@@ -7,7 +7,7 @@ import time
 @patch('device.mitemp2.Thermometer')
 class TestLedDevice(TestCase):
 
-    def test_send_discovery_config_on_connect(self, driver_mock):
+    def test_send_discovery_config_on_connect(self, _driver_mock):
         bridge = Mock()
         device = MiTemp2(TestConfig())
 
@@ -73,7 +73,7 @@ class TestLedDevice(TestCase):
         )])
 
     @patch('device.mitemp2.schedule')
-    def test_schedule_periodic_status_send_on_connect(self, schedule_mock, driver_mock):
+    def test_schedule_periodic_status_send_on_connect(self, schedule_mock, _driver_mock):
         config = TestConfig()
         device = MiTemp2(config)
 
@@ -93,7 +93,7 @@ class TestLedDevice(TestCase):
         bridge.send.assert_called()
 
     @patch('device.base.schedule')
-    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock, driver_mock):
+    def test_schedule_periodic_discovery_send_on_connect(self, schedule_mock, _driver_mock):
         config = TestConfig()
         device = MiTemp2(config)
 

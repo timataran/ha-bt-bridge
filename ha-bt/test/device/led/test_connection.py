@@ -43,14 +43,14 @@ class TestConnection(TestCase):
 
     def test_throw_on_connection_error(self, btle_mock):
 
-        def throw_btle_error(*args):
+        def throw_btle_error(*_args):
             raise BTLEDisconnectError('some_error')
 
         connection = Connection('mac_value')
         btle_mock.Peripheral.side_effect = throw_btle_error
         self.assertRaises(BTConnectError, connection.get_handle)
 
-    def test_not_throw_on_disconnect_not_connected(self, btle_mock):
+    def test_not_throw_on_disconnect_not_connected(self, _btle_mock):
         connection = Connection('mac_value')
         try:
             connection.disconnect()
